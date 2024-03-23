@@ -21,10 +21,10 @@ public class ToggleChatHeads implements CommandExecutor {
         }
 
         if (useChatHeads(player)) {
-            player.getPersistentDataContainer().remove(new NamespacedKey(ChatHead.getPlugin(), "enabled"));
+            player.getPersistentDataContainer().set(new NamespacedKey(ChatHead.getPlugin(), "disabled"), PersistentDataType.SHORT, (short) 1);
             player.sendMessage(prefix + "Chat heads have been disabled.");
         } else {
-            player.getPersistentDataContainer().set(new NamespacedKey(ChatHead.getPlugin(), "enabled"), PersistentDataType.SHORT, (short) 1);
+            player.getPersistentDataContainer().remove(new NamespacedKey(ChatHead.getPlugin(), "disabled"));
             player.sendMessage(prefix + "Chat heads have been enabled.");
         }
 
@@ -33,6 +33,6 @@ public class ToggleChatHeads implements CommandExecutor {
 
 
     public static boolean useChatHeads(Player player) {
-        return player.getPersistentDataContainer().has(new NamespacedKey(ChatHead.getPlugin(), "enabled"), PersistentDataType.SHORT);
+        return !player.getPersistentDataContainer().has(new NamespacedKey(ChatHead.getPlugin(), "disabled"), PersistentDataType.SHORT);
     }
 }

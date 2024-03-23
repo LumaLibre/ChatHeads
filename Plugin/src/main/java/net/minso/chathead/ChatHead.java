@@ -41,13 +41,15 @@ public final class ChatHead extends JavaPlugin {
         plugin = this;
         useTextureAPI = getServer().getPluginManager().getPlugin("TextureAPI") != null;
         getCommand("chatheads").setExecutor(new ToggleChatHeads());
+        //getServer().getPluginManager().registerEvents(new InteractiveChatListener(), this);
 
         ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
 
-        protocolManager.addPacketListener(new PacketAdapter(this, ListenerPriority.NORMAL, PacketType.Play.Server.CHAT) {
+
+        protocolManager.addPacketListener(new PacketAdapter(this, ListenerPriority.HIGHEST, PacketType.Play.Server.CHAT) {
             @Override
             public void onPacketSending(PacketEvent event) {
-                if (!ToggleChatHeads.useChatHeads(event.getPlayer())) {
+                if (!ToggleChatHeads.useChatHeads(event.getPlayer()) || !event.getPlayer().hasResourcePack()) {
                     return;
                 }
 
@@ -79,11 +81,11 @@ public final class ChatHead extends JavaPlugin {
     }
 
 
-    public BaseComponent[] getHead(Player player) {
+    public static BaseComponent[] getHead(Player player) {
         return getHead(player.getUniqueId());
     }
 
-    public BaseComponent[] getHead(UUID uuid) {
+    public static BaseComponent[] getHead(UUID uuid) {
         String[] hexColors;
         if (useTextureAPI) {
             hexColors = getPixelColors(getPlayerSkinURLFromTextureAPI(uuid));
@@ -125,7 +127,7 @@ public final class ChatHead extends JavaPlugin {
         return baseComponents;
     }
 
-    private String[] getPixelColors(String playerSkinUrl) {
+    private static String[] getPixelColors(String playerSkinUrl) {
         String[] colors = new String[64];
         try {
             BufferedImage skinImage = ImageIO.read(new URL(playerSkinUrl));
@@ -152,7 +154,7 @@ public final class ChatHead extends JavaPlugin {
     }
 
 
-    private String getPlayerSkinURL(UUID uuid) {
+    private static String getPlayerSkinURL(UUID uuid) {
         try {
             URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString());
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -186,7 +188,7 @@ public final class ChatHead extends JavaPlugin {
         return "Unable to retrieve player skin URL.";
     }
 
-    private String getPlayerSkinURLFromTextureAPI(UUID uuid) {
+    private static String getPlayerSkinURLFromTextureAPI(UUID uuid) {
         try {
 
             String json = new String(Base64.getDecoder().decode(TextureAPI.getTexture(uuid).getBase64()));

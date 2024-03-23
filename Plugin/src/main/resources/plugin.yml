@@ -3,6 +3,7 @@ version: '${project.version}'
 main: net.minso.chathead.ChatHead
 authors: [Minso, Jsinco]
 api-version: '1.20'
+depend: [ProtocolLib]
 softdepend: [TextureAPI]
 commands:
   chatheads:
