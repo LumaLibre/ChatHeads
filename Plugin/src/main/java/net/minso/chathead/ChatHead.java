@@ -1,14 +1,21 @@
 package net.minso.chathead;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
+import com.comphenix.protocol.events.ListenerPriority;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import dev.jsinco.textureapi.TextureAPI;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.chat.ComponentSerializer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,54 +31,65 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.UUID;
 
-public final class Main extends JavaPlugin implements Listener {
+public final class ChatHead extends JavaPlugin {
+
+    private static ChatHead plugin;
+    private static boolean useTextureAPI = true;
 
     @Override
     public void onEnable() {
-        getServer().getPluginManager().registerEvents(this, this);
+        plugin = this;
+        useTextureAPI = getServer().getPluginManager().getPlugin("TextureAPI") != null;
+        getCommand("chatheads").setExecutor(new ToggleChatHeads());
 
+        ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+
+        protocolManager.addPacketListener(new PacketAdapter(this, ListenerPriority.NORMAL, PacketType.Play.Server.CHAT) {
+            @Override
+            public void onPacketSending(PacketEvent event) {
+                if (!ToggleChatHeads.useChatHeads(event.getPlayer())) {
+                    return;
+                }
+
+                PacketContainer container = event.getPacket();
+
+                // need to get the sender of the msg
+                Player player = Bukkit.getPlayer(container.getUUIDs().getValues().get(0));
+                if (player == null) {
+                    return;
+                }
+
+                // add to original msg
+                TextComponent textComponent = new TextComponent();
+                textComponent.setText(" ");
+                textComponent.setFont("minecraft:default");
+                BaseComponent[] head = new ComponentBuilder().append(getHead(player)).append(textComponent).create();
+
+
+                WrappedChatComponent wrappedChatComponent = container.getChatComponents().read(0);
+
+                String combinedJson = "[" + ComponentSerializer.toString(head) + "," + wrappedChatComponent.getJson() + "]";
+
+                WrappedChatComponent combinedComponent = WrappedChatComponent.fromJson(combinedJson);
+
+                container.getChatComponents().write(0, combinedComponent);
+                event.setPacket(container);
+            }
+        });
     }
 
-    @EventHandler
-    public void playerJoin(PlayerJoinEvent event) {
-        event.setJoinMessage("");
-        Player player = event.getPlayer();
-
-        TextComponent textComponent = new TextComponent();
-        textComponent.setText(" ");
-        textComponent.setFont("minecraft:default");
-
-        BaseComponent[] head1 = getHead(UUID.fromString("d30e61cb-f6d6-4941-b30c-b2c6adce9254"));
-        BaseComponent[] head2 = getHead(UUID.fromString("c2013a02-a45b-411c-b79a-006ee3ec8295"));
-        BaseComponent[] head3 = getHead(UUID.fromString("f0453a4c-abd1-4fc9-9f1d-6bab7f685096"));
-        BaseComponent[] head4 = getHead(UUID.fromString("84e96f90-203e-449e-9af7-95a383d6ff1a"));
-        BaseComponent[] head5 = getHead(player);
-
-        BaseComponent[] combinedHeads = new ComponentBuilder()
-                .append(head1)
-                .append(textComponent)
-                .append(head2)
-                .append(textComponent)
-                .append(head3)
-                .append(textComponent)
-                .append(head4)
-                .append(textComponent)
-                .append(head5)
-                .create();
-
-        player.spigot().sendMessage(combinedHeads);
-
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, combinedHeads);
-
-
-    }
 
     public BaseComponent[] getHead(Player player) {
         return getHead(player.getUniqueId());
     }
 
     public BaseComponent[] getHead(UUID uuid) {
-        String[] hexColors = getPixelColors(getPlayerSkinURL(uuid));
+        String[] hexColors;
+        if (useTextureAPI) {
+            hexColors = getPixelColors(getPlayerSkinURLFromTextureAPI(uuid));
+        } else {
+            hexColors = getPixelColors(getPlayerSkinURL(uuid));
+        }
 
         if (hexColors == null || hexColors.length < 64) {
             throw new IllegalArgumentException("Hex colors array must have at least 64 elements.");
@@ -158,6 +176,7 @@ public final class Main extends JavaPlugin implements Listener {
                     byte[] decodedBytes = Base64.getDecoder().decode(value);
                     String decodedValue = new String(decodedBytes);
                     JSONObject textureJson = new JSONObject(decodedValue);
+
                     return textureJson.getJSONObject("textures").getJSONObject("SKIN").getString("url");
                 }
             }
@@ -167,6 +186,21 @@ public final class Main extends JavaPlugin implements Listener {
         return "Unable to retrieve player skin URL.";
     }
 
+    private String getPlayerSkinURLFromTextureAPI(UUID uuid) {
+        try {
 
+            String json = new String(Base64.getDecoder().decode(TextureAPI.getTexture(uuid).getBase64()));
+            JSONObject jsonObject = new JSONObject(json);
+
+            return jsonObject.getJSONObject("textures").getJSONObject("SKIN").getString("url");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "Unable to retrieve player skin URL.";
+    }
+
+    public static ChatHead getPlugin() {
+        return plugin;
+    }
 
 }
