@@ -86,12 +86,7 @@ public final class ChatHead extends JavaPlugin {
     }
 
     public static BaseComponent[] getHead(UUID uuid) {
-        String[] hexColors;
-        if (useTextureAPI) {
-            hexColors = getPixelColors(getPlayerSkinURLFromTextureAPI(uuid));
-        } else {
-            hexColors = getPixelColors(getPlayerSkinURL(uuid));
-        }
+        String[] hexColors = getPixelColorsMinotarNet(uuid.toString());
 
         if (hexColors == null || hexColors.length < 64) {
             throw new IllegalArgumentException("Hex colors array must have at least 64 elements.");
@@ -143,6 +138,29 @@ public final class ChatHead extends JavaPlugin {
             for (int x = 0; x < faceHeight; x++) {
                 for (int y = 0; y < faceWidth; y++) {
                     int rgb = faceImage.getRGB(x, y);
+                    String hexColor = String.format("#%06X", (rgb & 0xFFFFFF));
+                    colors[index++] = hexColor;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return colors;
+    }
+
+    private static String[] getPixelColorsMinotarNet(String uuid) {
+        uuid = uuid.replace("-", "").strip();
+        String[] colors = new String[64]; // 64
+        try {
+            BufferedImage skinImage = ImageIO.read(new URL("https://minotar.net/helm/"+uuid+"/8.png")); // playerSkinUrl
+
+            int faceWidth = 8; // 8
+            int faceHeight = 8; // 8
+
+            int index = 0;
+            for (int x = 0; x < faceHeight; x++) {
+                for (int y = 0; y < faceWidth; y++) {
+                    int rgb = skinImage.getRGB(x, y);
                     String hexColor = String.format("#%06X", (rgb & 0xFFFFFF));
                     colors[index++] = hexColor;
                 }
