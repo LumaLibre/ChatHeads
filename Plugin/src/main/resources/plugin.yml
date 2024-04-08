@@ -14,7 +14,7 @@ commands:
     aliases:
       - chathead
 permissions:
-  chatheads.disable:
+  chatheads.toggle:
     description: 'Disable chat heads'
     default: true
   chatheads.orientation:

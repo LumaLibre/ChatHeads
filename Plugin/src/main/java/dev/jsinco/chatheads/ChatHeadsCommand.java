@@ -32,7 +32,7 @@ public class ChatHeadsCommand implements TabExecutor {
 
         switch (strings[0].toLowerCase()) {
             case "toggle":
-                if (!player.hasPermission("chatheads.disable")) {
+                if (!player.hasPermission("chatheads.toggle")) {
                     commandSender.sendMessage(MiniMessage.miniMessage().deserialize(Configuration.prefix + "<red>You do not have permission to use this command."));
                     return true;
                 }
