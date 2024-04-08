@@ -1,0 +1,25 @@
+name: ChatHeads
+version: '${version}'
+main: dev.jsinco.chatheads.ChatHeads
+authors:
+  - Jsinco
+  - Minso
+api-version: '1.20'
+depend:
+  - ProtocolLib
+commands:
+  chatheads:
+    description: 'Base command'
+    permission: 'chathead.command'
+    aliases:
+      - chathead
+permissions:
+  chatheads.disable:
+    description: 'Disable chat heads'
+    default: true
+  chatheads.orientation:
+    description: 'Change chat head orientation'
+    default: true
+  chatheads.reload:
+    description: 'Reload chat heads'
+    default: op
