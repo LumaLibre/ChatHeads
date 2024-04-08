@@ -137,13 +137,13 @@ public class Handler extends BukkitRunnable implements Listener {
         final TextComponent textComponent = new TextComponent(" ");
         textComponent.setFont("minecraft:default");
 
-        final BaseComponent[] avatar = sender.doNotReverseOrientation() ?
+        final BaseComponent[] avatar = receiver.doNotReverseOrientation() ?
                 new ComponentBuilder().append(sender.getAvatar()).append(textComponent).create() :
                 new ComponentBuilder().append(textComponent).append(sender.getAvatar()).create();
 
         // add to original msg
         WrappedChatComponent wrappedChatComponent = container.getChatComponents().read(0);
-        String combinedJson = sender.doNotReverseOrientation() ?
+        String combinedJson = receiver.doNotReverseOrientation() ?
                 "[" + ComponentSerializer.toString(avatar) + "," + wrappedChatComponent.getJson() + "]" :
                 "[" + wrappedChatComponent.getJson() + "," + ComponentSerializer.toString(avatar) + "]";
 
