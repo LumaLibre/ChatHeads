@@ -24,7 +24,7 @@ public class ChatHeadsCommand implements TabExecutor {
 
         if (strings.length == 0) {
             commandSender.sendMessage(MiniMessage.miniMessage().deserialize(Configuration.prefix +
-                    "Running ChatHeads v" + ChatHeads.getPlugin().getDescription().getVersion() + "By <aqua>Jsinco</aqua> & <aqua>Minso</aqua>"));
+                    "Running ChatHeads v" + ChatHeads.getPlugin().getDescription().getVersion() + " By <aqua>Jsinco</aqua> & <aqua>Minso</aqua>"));
             return true;
         }
 

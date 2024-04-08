@@ -10,7 +10,7 @@ depend:
 commands:
   chatheads:
     description: 'Base command'
-    permission: 'chathead.command'
+    permission: 'chatheads.command'
     aliases:
       - chathead
 permissions:
