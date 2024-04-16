@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "dev.jsinco"
-version = "1.0-SNAPSHOT"
+version = "1.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -25,6 +25,10 @@ dependencies {
 
 
 tasks {
+
+    java {
+        toolchain.languageVersion = JavaLanguageVersion.of(17)
+    }
 
     assemble {
         dependsOn("reobfJar")

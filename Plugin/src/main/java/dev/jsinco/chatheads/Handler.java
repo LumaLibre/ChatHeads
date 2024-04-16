@@ -23,7 +23,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings("deprecation")
@@ -100,11 +102,17 @@ public class Handler extends BukkitRunnable implements Listener {
 
     @Override
     public void run() {
-        for (CachedPlayer cachedPlayer : cachedPlayers.values()) {
-            Player player = cachedPlayer.getPlayer();
+        final List<UUID> playersToRemove = new ArrayList<>();
+
+        for (final CachedPlayer cachedPlayer : cachedPlayers.values()) {
+            final Player player = cachedPlayer.getPlayer();
             if (!player.isOnline()) {
-                cachedPlayers.remove(player.getUniqueId());
+                playersToRemove.add(player.getUniqueId());
             }
+        }
+
+        for (final UUID uuid : playersToRemove) {
+            cachedPlayers.remove(uuid);
         }
     }
 
