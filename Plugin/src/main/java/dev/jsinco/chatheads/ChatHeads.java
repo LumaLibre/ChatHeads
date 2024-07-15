@@ -8,6 +8,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class ChatHeads extends JavaPlugin {
 
     private static ChatHeads plugin;
+    public static boolean floodgateEnabled = false;
 
     @Override
     public void onEnable() {
@@ -23,6 +24,10 @@ public final class ChatHeads extends JavaPlugin {
             handler.addCachedPlayer(player);
         }
         getCommand("chatheads").setExecutor(new ChatHeadsCommand());
+
+        if (Bukkit.getPluginManager().getPlugin("floodgate") != null) {
+            floodgateEnabled = true;
+        }
     }
 
     public static ChatHeads getPlugin() {
