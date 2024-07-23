@@ -1,5 +1,7 @@
 package dev.jsinco.chatheads;
 
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import dev.jsinco.abstractjavafilelib.FileLibSettings;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -28,6 +30,12 @@ public final class ChatHeads extends JavaPlugin {
         if (Bukkit.getPluginManager().getPlugin("floodgate") != null) {
             floodgateEnabled = true;
         }
+    }
+
+    @Override
+    public void onDisable() {
+        ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
+        protocolManager.removePacketListeners(this);
     }
 
     public static ChatHeads getPlugin() {

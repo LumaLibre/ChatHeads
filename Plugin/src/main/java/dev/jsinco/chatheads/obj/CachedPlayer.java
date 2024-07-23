@@ -18,7 +18,7 @@ public class CachedPlayer extends CachedPlayerConfig {
     public CachedPlayer(Player player) {
         super(player);
         this.player = player;
-        Bukkit.getScheduler().runTaskAsynchronously(ChatHeads.getPlugin(), () -> this.avatar = ChatHeadUtils.getChatHead(player.getUniqueId()));
+        Bukkit.getScheduler().runTaskAsynchronously(ChatHeads.getPlugin(), () -> this.avatar = ChatHeadUtils.getHead(player));
     }
 
     public Player getPlayer() {
@@ -34,7 +34,7 @@ public class CachedPlayer extends CachedPlayerConfig {
     }
 
     public void updateAvatar() {
-        this.avatar = ChatHeadUtils.getChatHead(player.getUniqueId());
+        this.avatar = ChatHeadUtils.getHead(player);
     }
 
     public boolean isDisabledChatHead() {
