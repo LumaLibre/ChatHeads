@@ -2,12 +2,13 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id("java")
-    id("io.papermc.paperweight.userdev") version "1.5.12"
+    id("io.papermc.paperweight.userdev") version "1.7.1"
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
+val javaVers = 21
 group = "dev.jsinco"
-version = "1.2-SNAPSHOT"
+version = "1.3-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -15,13 +16,15 @@ repositories {
     maven("https://jitpack.io")
     maven("https://repo.dmulloy2.net/repository/public/")
     maven("https://repo.opencollab.dev/main/")
+    maven("https://repo.essentialsx.net/releases/")
+    maven("https://oss.sonatype.org/content/groups/public/")
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21-R0.1-SNAPSHOT")
     compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")
     implementation("com.github.Jsinco:AbstractJavaFileLib:1.3")
-    paperweight.paperDevBundle("1.20.4-R0.1-SNAPSHOT")
     compileOnly("org.geysermc.floodgate:api:2.2.2-SNAPSHOT")
 }
 
@@ -29,11 +32,11 @@ dependencies {
 tasks {
 
     java {
-        toolchain.languageVersion = JavaLanguageVersion.of(17)
+        toolchain.languageVersion = JavaLanguageVersion.of(javaVers)
     }
 
     assemble {
-        dependsOn("reobfJar")
+        dependsOn(reobfJar)
     }
 
     processResources {

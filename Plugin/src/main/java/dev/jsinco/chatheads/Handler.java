@@ -68,7 +68,7 @@ public class Handler extends BukkitRunnable implements Listener {
                 // get name
                 Player player = null;
 
-                final String displayName = ((ChatType.BoundNetwork) container.getModifier().read(1)).name().getString();
+                final String displayName = ((ChatType.Bound) container.getModifier().read(1)).name().getString();
                 for (Player aPlayer : Bukkit.getOnlinePlayers()) {
                     final String playerDisplayName = PlainTextComponentSerializer.plainText().serialize(aPlayer.displayName());
                     if (displayName.equals(playerDisplayName)) {
