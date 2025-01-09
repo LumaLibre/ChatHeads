@@ -1,0 +1,12 @@
+# Minimessage format
+prefix: "<bold><#F498F6>I<#C990F9>n<#9D88FC>f<#7280FF>o <reset><dark_gray>»<#E2E2E2> "
+
+image-size: 8
+
+avatarURLs:
+  - "https://minotar.net/helm/{uuid-no-dashes}/8.png"
+  - "https://crafatar.com/avatars/{uuid-no-dashes}?size=8&default=MHF_Steve&overlay"
+  - "https://api.mineatar.io/face/{uuid-no-dashes}?scale=8"
+  - "https://mc-heads.net/avatar/{uuid-no-dashes}/8"
+
+debug: true
