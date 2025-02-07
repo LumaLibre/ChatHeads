@@ -25,7 +25,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@SuppressWarnings("deprecation")
 public class Handler implements Listener {
 
     private static final ConcurrentHashMap<UUID, CachedPlayer> cachedPlayers = new ConcurrentHashMap<>();
