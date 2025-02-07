@@ -2,19 +2,18 @@ package dev.jsinco.chatheads.obj;
 
 import dev.jsinco.chatheads.ChatHeadUtils;
 import dev.jsinco.chatheads.ChatHeads;
-import net.md_5.bungee.api.chat.BaseComponent;
+import dev.jsinco.chatheads.Handler;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.geysermc.floodgate.api.FloodgateApi;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-@SuppressWarnings("deprecation")
 public class CachedPlayer extends CachedPlayerConfig {
 
 
-    private BaseComponent[] avatar;
+    private Component avatar;
 
     public CachedPlayer(Player player) {
         super(player.getUniqueId());
@@ -22,11 +21,11 @@ public class CachedPlayer extends CachedPlayerConfig {
     }
 
 
-    public BaseComponent[] getAvatar() {
+    public Component getAvatar() {
         return avatar;
     }
 
-    public void setAvatar(BaseComponent[] avatar) {
+    public void setAvatar(Component avatar) {
         this.avatar = avatar;
     }
 
@@ -62,5 +61,9 @@ public class CachedPlayer extends CachedPlayerConfig {
 
         FloodgateApi floodgateApi = FloodgateApi.getInstance();
         return floodgateApi.isFloodgatePlayer(uuid);
+    }
+
+    public static CachedPlayer getFromPlayer(Player player) {
+        return Handler.getCachedPlayer(player);
     }
 }

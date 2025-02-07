@@ -3,6 +3,7 @@ package dev.jsinco.chatheads;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import dev.jsinco.abstractjavafilelib.FileLibSettings;
+import dev.jsinco.chatheads.integration.PAPIIntegration;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -10,6 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class ChatHeads extends JavaPlugin {
 
     private static ChatHeads plugin;
+    private static PAPIIntegration papiIntegration;
     public static boolean floodgateEnabled = false;
 
     @Override
@@ -27,8 +29,13 @@ public final class ChatHeads extends JavaPlugin {
         }
         getCommand("chatheads").setExecutor(new ChatHeadsCommand());
 
-        if (Bukkit.getPluginManager().getPlugin("floodgate") != null) {
+        if (getServer().getPluginManager().isPluginEnabled("floodgate")) {
             floodgateEnabled = true;
+        }
+
+        if (getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            papiIntegration = new PAPIIntegration();
+            papiIntegration.register();
         }
     }
 
@@ -36,6 +43,9 @@ public final class ChatHeads extends JavaPlugin {
     public void onDisable() {
         ProtocolManager protocolManager = ProtocolLibrary.getProtocolManager();
         protocolManager.removePacketListeners(this);
+        if (papiIntegration != null) {
+            papiIntegration.unregister();
+        }
     }
 
     public static ChatHeads getPlugin() {

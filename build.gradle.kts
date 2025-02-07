@@ -2,12 +2,13 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id("java")
+    id("maven-publish")
     id("io.papermc.paperweight.userdev") version "1.7.5"
     id("com.gradleup.shadow") version "8.3.5"
 }
 
 group = "dev.jsinco.chatheads"
-version = "1.5"
+version = "1.6"
 
 repositories {
     mavenCentral()
@@ -17,6 +18,7 @@ repositories {
     maven("https://repo.opencollab.dev/main/")
     maven("https://repo.essentialsx.net/releases/")
     maven("https://oss.sonatype.org/content/groups/public/")
+    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
 }
 
 dependencies {
@@ -24,6 +26,7 @@ dependencies {
     compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")
     implementation("com.github.Jsinco:AbstractJavaFileLib:1.3")
     compileOnly("org.geysermc.floodgate:api:2.2.2-SNAPSHOT")
+    compileOnly("me.clip:placeholderapi:2.11.6")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
@@ -60,5 +63,31 @@ tasks {
 
     withType<JavaCompile>().configureEach {
         options.encoding = "UTF-8"
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "jsinco-repo"
+            url = uri("https://repo.jsinco.dev/releases")
+            credentials(PasswordCredentials::class) {
+                username = System.getenv("repo_username")
+                password = System.getenv("repo_secret")
+            }
+            authentication {
+                create<BasicAuthentication>("basic")
+            }
+        }
+    }
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = project.group.toString()
+            artifactId = project.name
+            version = project.version.toString()
+            artifact(tasks.shadowJar.get().archiveFile) {
+                builtBy(tasks.shadowJar)
+            }
+        }
     }
 }
