@@ -9,6 +9,7 @@ depend:
   - ProtocolLib
 softdepend:
   - floodgate
+  - PlaceholderAPI
 commands:
   chatheads:
     description: 'Base command'

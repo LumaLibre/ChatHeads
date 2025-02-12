@@ -9,11 +9,10 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import dev.jsinco.chatheads.obj.CachedPlayer;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.chat.ComponentSerializer;
 import net.minecraft.network.chat.ChatType;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -21,16 +20,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@SuppressWarnings("deprecation")
 public class Handler implements Listener {
 
     private static final ConcurrentHashMap<UUID, CachedPlayer> cachedPlayers = new ConcurrentHashMap<>();
+    private static final Key DEFAULT_FONT_KEY = Key.key("minecraft", "default");
 
     private final ChatHeads plugin;
 
@@ -130,18 +128,28 @@ public class Handler implements Listener {
             return null;
         }
 
-        final TextComponent textComponent = new TextComponent(" ");
-        textComponent.setFont("minecraft:default");
+        Component space = Component.text(" ")
+                .font(DEFAULT_FONT_KEY);
 
-        final BaseComponent[] avatar = receiver.doNotReverseOrientation() ?
-                new ComponentBuilder().append(sender.getAvatar()).append(textComponent).create() :
-                new ComponentBuilder().append(textComponent).append(sender.getAvatar()).create();
+        Component avatar = receiver.doNotReverseOrientation() ?
+                sender.getAvatar().append(space) :
+                space.append(sender.getAvatar());
+
+
+        String serialized = JSONComponentSerializer.json().serialize(avatar);
 
         // add to original msg
         WrappedChatComponent wrappedChatComponent = container.getChatComponents().read(0);
-        String combinedJson = receiver.doNotReverseOrientation() ?
-                "[" + ComponentSerializer.toString(avatar) + "," + wrappedChatComponent.getJson() + "]" :
-                "[" + wrappedChatComponent.getJson() + "," + ComponentSerializer.toString(avatar) + "]";
+        String combinedJson;
+        if (wrappedChatComponent != null) {
+            combinedJson = receiver.doNotReverseOrientation() ?
+                    "[" + serialized + "," + wrappedChatComponent.getJson() + "]" :
+                    "[" + wrappedChatComponent.getJson() + "," + serialized + "]";
+        } else {
+            ChatHeads.getPlugin().getLogger().warning("WrappedChatComponent is null, couldn't add chat head");
+            return null;
+            //combinedJson = "[" + serialized + "]";
+        }
 
         WrappedChatComponent combinedComponent = WrappedChatComponent.fromJson(combinedJson);
         container.getChatComponents().write(0, combinedComponent);
