@@ -3,7 +3,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 plugins {
     id("java")
     id("maven-publish")
-    id("io.papermc.paperweight.userdev") version "1.7.5"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.14"
     id("com.gradleup.shadow") version "8.3.5"
 }
 
@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    paperweight.paperDevBundle("1.21.3-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
     compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")
     implementation("com.github.Jsinco:AbstractJavaFileLib:1.3")
     compileOnly("org.geysermc.floodgate:api:2.2.2-SNAPSHOT")
