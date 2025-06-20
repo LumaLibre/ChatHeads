@@ -1,5 +1,6 @@
 package dev.jsinco.chatheads.integration;
 
+import dev.jsinco.chatheads.api.ChatHeadsAPI;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;

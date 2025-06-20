@@ -8,6 +8,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import dev.jsinco.chatheads.api.ChatHeadsInjectEvent;
 import dev.jsinco.chatheads.obj.CachedPlayer;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -25,7 +26,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-@SuppressWarnings("deprecation")
 public class Handler implements Listener {
 
     private static final ConcurrentHashMap<UUID, CachedPlayer> cachedPlayers = new ConcurrentHashMap<>();
@@ -132,9 +132,14 @@ public class Handler implements Listener {
         Component space = Component.text(" ")
                 .font(DEFAULT_FONT_KEY);
 
-        Component avatar = receiver.doNotReverseOrientation() ?
-                sender.getAvatar().append(space) :
-                space.append(sender.getAvatar());
+
+        ChatHeadsInjectEvent injectEvent = new ChatHeadsInjectEvent(sender.getPlayer(), packetRecipient, sender.getAvatar(), receiver.doNotReverseOrientation());
+        if (!injectEvent.callEvent()) {
+            return null;
+        }
+        Component avatar = injectEvent.isReverseOrientation() ?
+                injectEvent.getAvatar().append(space) :
+                space.append(injectEvent.getAvatar());
 
 
         String serialized = JSONComponentSerializer.json().serialize(avatar);

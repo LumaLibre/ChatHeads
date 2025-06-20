@@ -1,4 +1,4 @@
-package dev.jsinco.chatheads.integration;
+package dev.jsinco.chatheads.api;
 
 import dev.jsinco.chatheads.Handler;
 import dev.jsinco.chatheads.obj.CachedPlayer;
