@@ -1,7 +1,5 @@
 package dev.jsinco.chatheads.api;
 
-import dev.jsinco.chatheads.Handler;
-import dev.jsinco.chatheads.obj.CachedPlayer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;

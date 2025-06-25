@@ -119,24 +119,24 @@ public class Handler implements Listener {
     @Nullable
     public PacketContainer chatHeadPacket(final PacketContainer container, final Player packetRecipient, final Player chatHeadPlayer) {
         CachedPlayer receiver = getCachedPlayer(packetRecipient);
-        if (receiver.isDisabledChatHead()) {
+        CachedPlayer sender = getCachedPlayer(chatHeadPlayer);
+
+
+        if (sender.getAvatar() == null) { // need to get the sender of the msg
             return null;
         }
 
-        // need to get the sender of the msg
-        CachedPlayer sender = getCachedPlayer(chatHeadPlayer);
-        if (sender.getAvatar() == null) {
+        ChatHeadsInjectEvent injectEvent = new ChatHeadsInjectEvent(sender.getPlayer(), packetRecipient, sender.getAvatar(), receiver.doNotReverseOrientation());
+        injectEvent.setCancelled(receiver.isDisabledChatHead());
+        if (!injectEvent.callEvent()) {
             return null;
         }
+
 
         Component space = Component.text(" ")
                 .font(DEFAULT_FONT_KEY);
 
 
-        ChatHeadsInjectEvent injectEvent = new ChatHeadsInjectEvent(sender.getPlayer(), packetRecipient, sender.getAvatar(), receiver.doNotReverseOrientation());
-        if (!injectEvent.callEvent()) {
-            return null;
-        }
         Component avatar = injectEvent.isReverseOrientation() ?
                 injectEvent.getAvatar().append(space) :
                 space.append(injectEvent.getAvatar());
