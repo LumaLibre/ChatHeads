@@ -121,11 +121,6 @@ public class Handler implements Listener {
         CachedPlayer receiver = getCachedPlayer(packetRecipient);
         CachedPlayer sender = getCachedPlayer(chatHeadPlayer);
 
-
-        if (sender.getAvatar() == null) { // need to get the sender of the msg
-            return null;
-        }
-
         ChatHeadsInjectEvent injectEvent = new ChatHeadsInjectEvent(sender.getPlayer(), packetRecipient, sender.getAvatar(), receiver.doNotReverseOrientation());
         injectEvent.setCancelled(receiver.isDisabledChatHead());
         if (!injectEvent.callEvent()) {
