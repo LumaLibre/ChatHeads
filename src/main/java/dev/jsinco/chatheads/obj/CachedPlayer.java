@@ -37,7 +37,7 @@ public class CachedPlayer extends CachedPlayerConfig {
         this.avatar = ChatHeadUtils.getHead(player);
     }
 
-    public boolean isDisabledChatHead() {
+    public boolean isNoResourcePack() {
         Player player = getPlayer();
         if (player == null) {
             return true;
@@ -47,7 +47,7 @@ public class CachedPlayer extends CachedPlayerConfig {
                     " checkBedrockPlayer(player.getUniqueId()): " + checkBedrockPlayer(player.getUniqueId()));
             ChatHeads.getPlugin().getLogger().info(String.valueOf(player.getResourcePackStatus()));
         }
-        return isDisabled() || !player.hasResourcePack() || checkBedrockPlayer(player.getUniqueId());
+        return !player.hasResourcePack() || checkBedrockPlayer(player.getUniqueId());
     }
 
     public boolean doNotReverseOrientation() {

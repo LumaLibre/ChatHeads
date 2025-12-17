@@ -122,7 +122,7 @@ public class Handler implements Listener {
         CachedPlayer sender = getCachedPlayer(chatHeadPlayer);
 
         ChatHeadsInjectEvent injectEvent = new ChatHeadsInjectEvent(sender.getPlayer(), packetRecipient, sender.getAvatar(), receiver.doNotReverseOrientation());
-        injectEvent.setCancelled(receiver.isDisabledChatHead());
+        injectEvent.setCancelled(receiver.isNoResourcePack() || receiver.isDisabled());
         if (!injectEvent.callEvent()) {
             return null;
         }

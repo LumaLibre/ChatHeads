@@ -8,13 +8,12 @@ plugins {
 }
 
 group = "dev.jsinco.chatheads"
-version = "1.7"
+version = "1.8"
 
 repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://jitpack.io")
-    maven("https://repo.dmulloy2.net/repository/public/")
     maven("https://repo.opencollab.dev/main/")
     maven("https://repo.essentialsx.net/releases/")
     maven("https://oss.sonatype.org/content/groups/public/")
@@ -23,7 +22,7 @@ repositories {
 
 dependencies {
     paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
-    compileOnly("com.comphenix.protocol:ProtocolLib:5.0.0")
+    compileOnly("net.dmulloy2:ProtocolLib:5.4.0")
     implementation("com.github.Jsinco:AbstractJavaFileLib:1.3")
     compileOnly("org.geysermc.floodgate:api:2.2.2-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.6")
