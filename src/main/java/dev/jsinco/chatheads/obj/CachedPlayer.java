@@ -17,7 +17,9 @@ public class CachedPlayer extends CachedPlayerConfig {
 
     public CachedPlayer(Player player) {
         super(player.getUniqueId());
-        Bukkit.getScheduler().runTaskAsynchronously(ChatHeads.getPlugin(), () -> this.avatar = ChatHeadUtils.getHead(player));
+        Bukkit.getAsyncScheduler().runNow(ChatHeads.getPlugin(), task -> {
+            this.avatar = ChatHeadUtils.getHead(player);
+        });
     }
 
 

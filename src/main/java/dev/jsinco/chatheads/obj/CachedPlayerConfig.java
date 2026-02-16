@@ -70,7 +70,7 @@ public class CachedPlayerConfig {
         if (!disabled && !reverseOrientation) {
             player.getPersistentDataContainer().remove(new NamespacedKey(ChatHeads.getPlugin(), "chatheads"));
         } else {
-            String string =  "disabled=" + disabled + ";reverseOrientation=" + reverseOrientation;
+            String string = "disabled=" + disabled + ";reverseOrientation=" + reverseOrientation;
             player.getPersistentDataContainer().set(new NamespacedKey(ChatHeads.getPlugin(), "chatheads"), PersistentDataType.STRING, string);
         }
     }

@@ -22,7 +22,6 @@ public final class ChatHeads extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(handler, this);
         handler.registerChatPacketListener();
-        //handler.runTaskTimerAsynchronously(this, 0, 6000);
 
         for (final Player player : Bukkit.getOnlinePlayers()) {
             handler.addCachedPlayer(player);

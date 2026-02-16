@@ -17,15 +17,16 @@ repositories {
     maven("https://repo.opencollab.dev/main/")
     maven("https://repo.essentialsx.net/releases/")
     maven("https://oss.sonatype.org/content/groups/public/")
-    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
+    maven("https://repo.extendedclip.com/releases")
+    maven("https://repo.jsinco.dev/releases")
 }
 
 dependencies {
     paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
     compileOnly("net.dmulloy2:ProtocolLib:5.4.0")
-    implementation("com.github.Jsinco:AbstractJavaFileLib:1.3")
     compileOnly("org.geysermc.floodgate:api:2.2.2-SNAPSHOT")
-    compileOnly("me.clip:placeholderapi:2.11.6")
+    compileOnly("me.clip:placeholderapi:2.12.2")
+    implementation("dev.jsinco.abstractjavafilelib:AbstractJavaFileLib:2.4")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
@@ -50,9 +51,7 @@ tasks {
     }
 
     shadowJar {
-        dependencies {
-            include(dependency("com.github.Jsinco:AbstractJavaFileLib"))
-        }
+        relocate("dev.jsinco.abstractjavafilelib", "dev.jsinco.chatheads.lib.abstractjavafilelib")
         archiveClassifier.set("")
     }
 

@@ -1,6 +1,7 @@
 name: ChatHeads
 version: '${version}'
 main: dev.jsinco.chatheads.ChatHeads
+folia-supported: true
 authors:
   - Jsinco
   - Minso
