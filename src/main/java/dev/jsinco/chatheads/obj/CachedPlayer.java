@@ -13,7 +13,7 @@ import java.util.UUID;
 public class CachedPlayer extends CachedPlayerConfig {
 
 
-    private Component avatar;
+    private volatile Component avatar = Component.empty();
 
     public CachedPlayer(Player player) {
         super(player.getUniqueId());
@@ -49,7 +49,7 @@ public class CachedPlayer extends CachedPlayerConfig {
                     " checkBedrockPlayer(player.getUniqueId()): " + checkBedrockPlayer(player.getUniqueId()));
             ChatHeads.getPlugin().getLogger().info(String.valueOf(player.getResourcePackStatus()));
         }
-        return !player.hasResourcePack(); //|| checkBedrockPlayer(player.getUniqueId());
+        return checkBedrockPlayer(player.getUniqueId()) || !player.hasResourcePack();
     }
 
     public boolean doNotReverseOrientation() {
@@ -57,12 +57,11 @@ public class CachedPlayer extends CachedPlayerConfig {
     }
 
     public static boolean checkBedrockPlayer(UUID uuid) {
-        if (!ChatHeads.floodgateEnabled) {
-            return false;
+        if (ChatHeads.floodgateEnabled && FloodgateApi.getInstance().isFloodgatePlayer(uuid)) {
+            return true;
         }
 
-        FloodgateApi floodgateApi = FloodgateApi.getInstance();
-        return floodgateApi.isFloodgatePlayer(uuid);
+        return uuid.version() == 0;
     }
 
     public static CachedPlayer getFromPlayer(Player player) {

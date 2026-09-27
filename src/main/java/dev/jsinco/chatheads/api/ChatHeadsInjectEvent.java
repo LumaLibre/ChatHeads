@@ -1,6 +1,7 @@
 package dev.jsinco.chatheads.api;
 
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -20,6 +21,7 @@ public class ChatHeadsInjectEvent extends Event implements Cancellable {
     private boolean cancelled;
 
     public ChatHeadsInjectEvent(@Nullable Player player, @NotNull Player receiver, @NotNull Component avatar, boolean reverseOrientation) {
+        super(!Bukkit.isPrimaryThread());
         this.player = player;
         this.receiver = receiver;
         this.avatar = avatar;

@@ -10,14 +10,18 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import dev.jsinco.chatheads.api.ChatHeadsInjectEvent;
 import dev.jsinco.chatheads.obj.CachedPlayer;
+import io.papermc.paper.chat.ChatRenderer;
+import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.protocol.game.ClientboundPlayerChatPacket;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -35,6 +39,29 @@ public class Handler implements Listener {
 
     public Handler(ChatHeads plugin) {
         this.plugin = plugin;
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onAsyncChat(AsyncChatEvent event) {
+        ChatRenderer originalRenderer = event.renderer();
+        event.renderer((source, sourceDisplayName, message, viewer) -> {
+            Component rendered = originalRenderer.render(source, sourceDisplayName, message, viewer);
+            if (!(viewer instanceof Player recipient) || !CachedPlayer.checkBedrockPlayer(recipient.getUniqueId())) {
+                return rendered;
+            }
+            CachedPlayer receiver = getCachedPlayer(recipient);
+            ChatHeadsInjectEvent injection = new ChatHeadsInjectEvent(source, recipient,
+                    Component.empty(), receiver.doNotReverseOrientation());
+            injection.setCancelled(true);
+            if (!injection.callEvent() || injection.getAvatar().equals(Component.empty())) {
+                return rendered;
+            }
+
+            Component space = Component.text(" ").font(DEFAULT_FONT_KEY);
+            return injection.isReverseOrientation()
+                    ? Component.empty().append(injection.getAvatar()).append(space).append(rendered)
+                    : Component.empty().append(rendered).append(space).append(injection.getAvatar());
+        });
     }
 
     public void registerChatPacketListener() {
@@ -118,12 +145,19 @@ public class Handler implements Listener {
 
     @Nullable
     public PacketContainer chatHeadPacket(final PacketContainer container, final Player packetRecipient, final Player chatHeadPlayer) {
+        // Bedrock icons are already included by the renderer, before glyph conversion.
+        if (CachedPlayer.checkBedrockPlayer(packetRecipient.getUniqueId())) {
+            return null;
+        }
         CachedPlayer receiver = getCachedPlayer(packetRecipient);
         CachedPlayer sender = getCachedPlayer(chatHeadPlayer);
 
-        ChatHeadsInjectEvent injectEvent = new ChatHeadsInjectEvent(sender.getPlayer(), packetRecipient, sender.getAvatar(), receiver.doNotReverseOrientation());
-        injectEvent.setCancelled(receiver.isNoResourcePack() || receiver.isDisabled());
-        if (!injectEvent.callEvent()) {
+        boolean hideChatHead = receiver.isNoResourcePack() || receiver.isDisabled();
+        // Still fire the event so integrations can supply content supported by this viewer.
+        ChatHeadsInjectEvent injectEvent = new ChatHeadsInjectEvent(sender.getPlayer(), packetRecipient,
+                hideChatHead ? Component.empty() : sender.getAvatar(), receiver.doNotReverseOrientation());
+        injectEvent.setCancelled(hideChatHead);
+        if (!injectEvent.callEvent() || injectEvent.getAvatar().equals(Component.empty())) {
             return null;
         }
 
@@ -141,11 +175,19 @@ public class Handler implements Listener {
 
         // add to original msg
         WrappedChatComponent wrappedChatComponent = container.getChatComponents().read(0);
+        if (wrappedChatComponent == null && container.getHandle() instanceof ClientboundPlayerChatPacket playerChat) {
+            // Unmodified signed chat has no unsigned component yet. Keep the signed body intact.
+            net.minecraft.network.chat.Component message = playerChat.filterMask().applyWithFormatting(playerChat.body().content());
+            if (message == null) {
+                return null; // Fully filtered messages must remain hidden.
+            }
+            wrappedChatComponent = WrappedChatComponent.fromHandle(message);
+        }
         String combinedJson;
         if (wrappedChatComponent != null) {
-            combinedJson = receiver.doNotReverseOrientation() ?
-                    "[" + serialized + "," + wrappedChatComponent.getJson() + "]" :
-                    "[" + wrappedChatComponent.getJson() + "," + serialized + "]";
+            combinedJson = injectEvent.isReverseOrientation() ?
+                    "{\"text\":\"\",\"extra\":[" + serialized + "," + wrappedChatComponent.getJson() + "]}" :
+                    "{\"text\":\"\",\"extra\":[" + wrappedChatComponent.getJson() + "," + serialized + "]}";
         } else {
             ChatHeads.getPlugin().getLogger().warning("WrappedChatComponent is null, couldn't add chat head");
             return null;
@@ -153,7 +195,9 @@ public class Handler implements Listener {
         }
 
         WrappedChatComponent combinedComponent = WrappedChatComponent.fromJson(combinedJson);
-        container.getChatComponents().write(0, combinedComponent);
-        return container;
+        // A broadcast may reuse its packet for multiple viewers. Replace only this viewer's copy.
+        PacketContainer recipientPacket = container.shallowClone();
+        recipientPacket.getChatComponents().write(0, combinedComponent);
+        return recipientPacket;
     }
 }
